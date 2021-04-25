@@ -62,13 +62,56 @@ class MarraQueryMaker:
             self.connection = None
 
     def write_weather_data_json(self, json_data, service, call_type, api_call):
+        inserted_id = None
         if self.connection is None:
             self.open_connection()
         try:
             cursor = self.connection.cursor()
             cursor.execute(sql_queries.write_weather_data_json,
                            (json_data, service, call_type, api_call))
+            inserted_id = cursor.fetchone()[0]
             cursor.close()
 
         except Exception as e:
             logging.warning("Could not write temperature / humidity reading to Marra")
+
+        return inserted_id
+
+    def has_quick_display_data(self, id):
+        if self.connection is None:
+            self.open_connection()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(sql_queries.get_quick_display, [id])
+            try:
+                result = cursor.fetchone()
+            except:
+                return False
+
+            cursor.close()
+            return result is not None
+
+        except Exception as e:
+            logging.warning('could not get quick display data from database')
+            return False
+
+    def write_quick_display_data(self, id, main, description, icon):
+        if self.connection is None:
+            self.open_connection()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(sql_queries.write_quick_display, (id, main, description, icon))
+            cursor.close()
+
+        except Exception as e:
+            logging.warning('could not write quick display data.')
+
+    def write_hourly_forcast(self, weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point):
+        if self.connection is None:
+            self.open_connection()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(sql_queries.write_hourly_forcast, (weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point))
+        except Exception as e:
+            logging.warning('could not write hourly forcast')
+

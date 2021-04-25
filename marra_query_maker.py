@@ -122,3 +122,12 @@ class MarraQueryMaker:
         finally:
             cursor.close()
 
+    def write_current_forcast(self, time_stamp, weather_forcast_id, sunrise, sunset, temperature, pressure, humidity, dew_point, uv_index, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, feels_like_temperature):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(sql_queries.write_current_forcast, (time_stamp, weather_forcast_id, sunrise, sunset, temperature, pressure, humidity, dew_point, uv_index, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, feels_like_temperature))
+        except Exception as e:
+            logging.warning('Could not write to current forcast')
+        finally:
+            cursor.close()
+

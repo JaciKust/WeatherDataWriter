@@ -24,6 +24,7 @@ class Runner:
             self.forcast_id = self.write_weather_data_json()
             self.write_all_hourly_data(self.weather_json['hourly'])
             self.write_all_daily_data(self.weather_json['daily'])
+            self.write_current_data_from_forcast(self.weather_json['current'])
         finally:
             self.query_maker.close_connection()
 
@@ -96,6 +97,28 @@ class Runner:
             weather_quick_display_id = self.write_weather_data(weather_quick_display[0])
 
             self.query_maker.write_daily_forcast(sunrise, sunset, moonrise, moon_phase, day_temp, min_temp, max_temp, night_temp, eve_temp, morning_temp, pressure, humidity, dew_point, wind_speed, wind_deg, wind_gust, weather_quick_display_id, clouds, pop, uv_index, self.forcast_id, time_stamp, moonset)
+
+    def write_current_data_from_forcast(self, current_data):
+        time_stamp = pandas.to_datetime(self.get_data(current_data, 'dt'), unit='s')
+        sunrise = pandas.to_datetime(self.get_data(current_data, 'sunrise'), unit='s')
+        sunset = pandas.to_datetime(self.get_data(current_data, 'sunset'), unit='s')
+        temperature = self.get_data(current_data, 'temp')
+        feels_like_temperature = self.get_data(current_data, 'feels_like')
+        pressure = self.get_data(current_data, 'pressure')
+        humidity = self.get_data(current_data, 'humidity')
+        dew_point = self.get_data(current_data, 'dew_point')
+        uv_index = self.get_data(current_data, 'uvi')
+        clouds = self.get_data(current_data, 'clouds')
+        visibility = self.get_data(current_data, 'visibility')
+        wind_speed = self.get_data(current_data, 'wind_speed')
+        wind_deg = self.get_data(current_data, 'wind_deg')
+        wind_gust = self.get_data(current_data, 'wind_gust')
+
+        weather_quick_display = self.get_data(current_data, 'weather')
+        weather_quick_display_id = self.write_weather_data(weather_quick_display[0])
+
+        self.query_maker.write_current_forcast(time_stamp, self.forcast_id, sunrise, sunset, temperature, pressure, humidity, dew_point, uv_index, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, feels_like_temperature)
+
 
     def write_weather_data(self, weather_data):
         id = self.get_data(weather_data, 'id')

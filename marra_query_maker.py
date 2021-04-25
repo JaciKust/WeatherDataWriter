@@ -65,6 +65,7 @@ class MarraQueryMaker:
         inserted_id = None
         if self.connection is None:
             self.open_connection()
+
         try:
             cursor = self.connection.cursor()
             cursor.execute(sql_queries.write_weather_data_json,
@@ -78,40 +79,46 @@ class MarraQueryMaker:
         return inserted_id
 
     def has_quick_display_data(self, id):
-        if self.connection is None:
-            self.open_connection()
+        cursor = self.connection.cursor()
         try:
-            cursor = self.connection.cursor()
             cursor.execute(sql_queries.get_quick_display, [id])
             try:
                 result = cursor.fetchone()
             except:
                 return False
 
-            cursor.close()
             return result is not None
 
         except Exception as e:
             logging.warning('could not get quick display data from database')
             return False
-
-    def write_quick_display_data(self, id, main, description, icon):
-        if self.connection is None:
-            self.open_connection()
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(sql_queries.write_quick_display, (id, main, description, icon))
+        finally:
             cursor.close()
 
+    def write_quick_display_data(self, id, main, description, icon):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(sql_queries.write_quick_display, (id, main, description, icon))
         except Exception as e:
             logging.warning('could not write quick display data.')
+        finally:
+            cursor.close()
 
     def write_hourly_forcast(self, weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point):
-        if self.connection is None:
-            self.open_connection()
+        cursor = self.connection.cursor()
         try:
-            cursor = self.connection.cursor()
             cursor.execute(sql_queries.write_hourly_forcast, (weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point))
         except Exception as e:
-            logging.warning('could not write hourly forcast')
+            logging.warning('Could not write hourly forcast')
+        finally:
+            cursor.close()
+
+    def write_daily_forcast(self, sunrise, sunset, moonrise, moon_phase, day_temp, min_temp, max_temp, night_temp, eve_temp, morning_temp, pressure, humidity, dew_point, wind_speed, wind_deg, wind_gust, weather_quick_display_id, clouds, pop, uv_index, weather_forcast_id, time_stamp, moon_set):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(sql_queries.write_daily_forcast, (sunrise, sunset, moonrise, moon_phase, day_temp, min_temp, max_temp, night_temp, eve_temp, morning_temp, pressure, humidity, dew_point, wind_speed, wind_deg, wind_gust, weather_quick_display_id, clouds, pop, uv_index, weather_forcast_id, time_stamp, moon_set))
+        except Exception as e:
+            logging.warning('Could not write to daily forcast.')
+        finally:
+            cursor.close()
 

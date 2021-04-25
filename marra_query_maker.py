@@ -96,38 +96,23 @@ class MarraQueryMaker:
             cursor.close()
 
     def write_quick_display_data(self, id, main, description, icon):
-        cursor = self.connection.cursor()
-        try:
-            cursor.execute(sql_queries.write_quick_display, (id, main, description, icon))
-        except Exception as e:
-            logging.warning('could not write quick display data.')
-        finally:
-            cursor.close()
+        self.make_sql_call(sql_queries.write_quick_display, (id, main, description, icon))
 
     def write_hourly_forcast(self, weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point):
-        cursor = self.connection.cursor()
-        try:
-            cursor.execute(sql_queries.write_hourly_forcast, (weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point))
-        except Exception as e:
-            logging.warning('Could not write hourly forcast')
-        finally:
-            cursor.close()
+        self.make_sql_call(sql_queries.write_hourly_forcast, (weather_forcast_id, timestamp, temperature, feels_like_temp, pressure, humidity, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, uv_index, dew_point))
 
     def write_daily_forcast(self, sunrise, sunset, moonrise, moon_phase, day_temp, min_temp, max_temp, night_temp, eve_temp, morning_temp, pressure, humidity, dew_point, wind_speed, wind_deg, wind_gust, weather_quick_display_id, clouds, pop, uv_index, weather_forcast_id, time_stamp, moon_set):
-        cursor = self.connection.cursor()
-        try:
-            cursor.execute(sql_queries.write_daily_forcast, (sunrise, sunset, moonrise, moon_phase, day_temp, min_temp, max_temp, night_temp, eve_temp, morning_temp, pressure, humidity, dew_point, wind_speed, wind_deg, wind_gust, weather_quick_display_id, clouds, pop, uv_index, weather_forcast_id, time_stamp, moon_set))
-        except Exception as e:
-            logging.warning('Could not write to daily forcast.')
-        finally:
-            cursor.close()
+        self.make_sql_call(sql_queries.write_daily_forcast, (sunrise, sunset, moonrise, moon_phase, day_temp, min_temp, max_temp, night_temp, eve_temp, morning_temp, pressure, humidity, dew_point, wind_speed, wind_deg, wind_gust, weather_quick_display_id, clouds, pop, uv_index, weather_forcast_id, time_stamp, moon_set))
 
     def write_current_forcast(self, time_stamp, weather_forcast_id, sunrise, sunset, temperature, pressure, humidity, dew_point, uv_index, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, feels_like_temperature):
+        self.make_sql_call(sql_queries.write_current_forcast, (time_stamp, weather_forcast_id, sunrise, sunset, temperature, pressure, humidity, dew_point, uv_index, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, feels_like_temperature))
+
+    def make_sql_call(self, query, arguments):
         cursor = self.connection.cursor()
         try:
-            cursor.execute(sql_queries.write_current_forcast, (time_stamp, weather_forcast_id, sunrise, sunset, temperature, pressure, humidity, dew_point, uv_index, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_quick_display_id, feels_like_temperature))
+            cursor.execute(query, arguments)
         except Exception as e:
-            logging.warning('Could not write to current forcast')
+            logging.warning("Failed to execute: " + query)
         finally:
             cursor.close()
 
